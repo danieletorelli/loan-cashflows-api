@@ -1,11 +1,29 @@
 queue_rules:
+  - name: duplicated default from Merge PRs into master
+    queue_conditions:
+      - base=master
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by=0"
+      - "label=mergify:squash"
+      - base=master
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by=0"
+      - "label=mergify:merge"
+    merge_conditions: []
+    merge_method: merge
   - name: default
-    conditions:
+    queue_conditions:
+      - base=master
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by=0"
+      - "label=mergify:squash"
+    merge_conditions:
       - "label!=WIP"
       - "label!=do-not-merge"
       - status-success=format
       - "status-success~=compile \\([0-9]+\\)"
       - "status-success~=test \\([0-9]+\\)"
+    merge_method: squash
 
 pull_request_rules:
   - name: Approve and label scala-steward's PRs
@@ -32,31 +50,13 @@ pull_request_rules:
       review:
         type: APPROVE
 
-  - name: Squash PRs into master
-    conditions:
-      - base=master
-      - "#approved-reviews-by>=1"
-      - "#changes-requested-reviews-by=0"
-      - "label=mergify:squash"
-    actions:
-      queue:
-        method: squash
-        name: default
-
-  - name: Merge PRs into master
-    conditions:
-      - base=master
-      - "#approved-reviews-by>=1"
-      - "#changes-requested-reviews-by=0"
-      - "label=mergify:merge"
-    actions:
-      queue:
-        method: merge
-        name: default
-
   - name: Delete head branch on merge
     conditions:
       - merged
     actions:
       delete_head_branch:
         force: false
+  - name: Merge PRs into master + Squash PRs into master
+    conditions: []
+    actions:
+      queue:
