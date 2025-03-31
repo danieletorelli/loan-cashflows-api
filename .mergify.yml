@@ -61,3 +61,8 @@ pull_request_rules:
     actions:
       delete_head_branch:
         force: false
+priority_rules:
+  - name: priority for queue `default-merge-queue`
+    conditions:
+      - "label=mergify:merge"
+    priority: 2250
